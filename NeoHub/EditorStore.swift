@@ -18,6 +18,7 @@ final class EditorStore: ObservableObject {
     public enum SortTarget {
         case menubar
         case switcher
+        case fixed
     }
 
     public func getEditors() -> [Editor] {
@@ -30,6 +31,9 @@ final class EditorStore: ObservableObject {
         switch sortTarget {
             case .menubar:
                 return editors.sorted { $0.name > $1.name }
+            case .fixed:
+                // Always return the last used editor, so we consider it as `fixed`
+                return editors.sorted { $0.lastAcceessTime > $1.lastAcceessTime }
             case .switcher:
                 var sorted = editors.sorted { $0.lastAcceessTime > $1.lastAcceessTime }
 
@@ -88,7 +92,7 @@ final class EditorStore: ObservableObject {
 
                     process.executableURL = req.bin
 
-                    let nofork = "--nofork"
+                    let nofork = "--no-fork"
 
                     process.arguments = req.opts
 
